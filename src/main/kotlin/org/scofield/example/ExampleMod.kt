@@ -1,4 +1,4 @@
-package net.fabricmc.example
+package org.scofield.example
 
 // For support join https://discord.gg/v6v4pMv
 
