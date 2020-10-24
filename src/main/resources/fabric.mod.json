@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.scofield.example.ExampleModKt::init"
+      "org.scofield.claims.MainKt::init"
     ]
   },
   "mixins": [

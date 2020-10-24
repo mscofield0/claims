@@ -1,4 +1,4 @@
-package org.scofield.example
+package org.scofield.claims
 
 // For support join https://discord.gg/v6v4pMv
 

@@ -1,4 +1,4 @@
-package org.scofield.example.mixin;
+package org.scofield.claims.mixin;
 
 import net.minecraft.client.gui.screen.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
