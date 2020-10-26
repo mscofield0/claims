@@ -15,7 +15,7 @@ data class Claim(
     var area: Rect,
 
     // Relation to other claims
-    var parentClaim: UUID? = null,
+    var parentClaimId: UUID? = null,
     val subclaims: MutableList<UUID> = mutableListOf(),
 
     // Permissions

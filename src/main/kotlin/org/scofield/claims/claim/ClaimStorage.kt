@@ -1,10 +1,13 @@
 package org.scofield.claims.claim
 
 import net.minecraft.server.network.ServerPlayerEntity
+import org.scofield.claims.claim.sort_map.SortMap
+import org.scofield.claims.claim.sort_map.SortMapPriorityQueueKey
 import org.scofield.claims.utils.Rect
 import org.scofield.claims.utils.intersects
 
 import java.util.*
+import kotlin.NoSuchElementException
 
 typealias ClaimStorage = SortMap<UUID, Claim>
 
@@ -84,7 +87,7 @@ fun ClaimStorage.createClaim(player: ServerPlayerEntity, area: Rect): Boolean {
  *
  * @throws StackOverflowError If the [generateUuid] function recurses for long enough.
  *
- * @return A boolean indicating if the creation was successful
+ * @return A boolean indicating if the creation was successful.
  */
 fun ClaimStorage.createSubclaim(player: ServerPlayerEntity, area: Rect): Boolean {
     val uuid = this.generateUuid()
@@ -92,7 +95,7 @@ fun ClaimStorage.createSubclaim(player: ServerPlayerEntity, area: Rect): Boolean
 
     val (layer, parentId) = this.getCollidingClaim(player.uuid, claim) ?: return false
 
-    claim.parentClaim = parentId
+    claim.parentClaimId = parentId
 
     val parentClaim = this.valueMap[parentId]!!
     parentClaim.subclaims.add(uuid)
@@ -102,14 +105,30 @@ fun ClaimStorage.createSubclaim(player: ServerPlayerEntity, area: Rect): Boolean
     return true
 }
 
-private fun ClaimStorage.deleteClaimImpl(player: ServerPlayerEntity, claimId: UUID) {
-    val claim = this.valueMap[claimId]!!
+/**
+ * Internal implementation function for [deleteClaim]
+ */
+private fun ClaimStorage.deleteClaimImpl(claimId: UUID) {
+    run {
+        val claim = this.valueMap[claimId]!!
+        for (subclaim in claim.subclaims) this.deleteClaimImpl(subclaim)
+    }
+
+    this.valueMap.remove(claimId)
+    this.layerMap.remove(SortMapPriorityQueueKey(0, claimId))
 }
 
 fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID): Boolean {
-    val claim = this.valueMap[claimId]!!
-    if (player.uuid != claim.ownerId) return false
+    run {
+        val claim = this.valueMap[claimId]!!
+        if (player.uuid != claim.ownerId) return false
 
-    
-    for (subclaim in claim.subclaims) this.deleteClaim(player, subclaim)
+        val parentId = claim.parentClaimId
+        if (parentId != null) {
+            val parentClaim = this.valueMap[parentId] ?: throw NoSuchElementException("This error shouldn't happen LOL!")
+            parentClaim.subclaims.remove(claimId)
+        }
+    }
+
+    this.deleteClaimImpl(claimId)
 }
