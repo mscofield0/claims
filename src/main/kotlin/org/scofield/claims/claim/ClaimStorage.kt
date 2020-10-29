@@ -11,6 +11,10 @@ import kotlin.NoSuchElementException
 
 typealias ClaimStorage = SortMap<UUID, Claim>
 
+fun ClaimStorage.getClaim(claimId: UUID): Claim? {
+    return this.valueMap[claimId]
+}
+
 /**
  * Generates a UUID that is guaranteed not to collide.
  *
@@ -109,6 +113,7 @@ fun ClaimStorage.createSubclaim(player: ServerPlayerEntity, area: Rect): Boolean
  * Internal implementation function for [deleteClaim]
  */
 private fun ClaimStorage.deleteClaimImpl(claimId: UUID) {
+    // Delete this claim's subclaims recursively
     run {
         val claim = this.valueMap[claimId]!!
         for (subclaim in claim.subclaims) this.deleteClaimImpl(subclaim)
@@ -118,7 +123,8 @@ private fun ClaimStorage.deleteClaimImpl(claimId: UUID) {
     this.layerMap.remove(SortMapPriorityQueueKey(0, claimId))
 }
 
-fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID): Boolean {
+fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID) {
+    // Delete the subclaim item from the parent claim's subclaims list
     run {
         val claim = this.valueMap[claimId]!!
         if (player.uuid != claim.ownerId) return false
@@ -130,5 +136,7 @@ fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID): Boolean
         }
     }
 
+    // Delete this claim's subclaims recursively
     this.deleteClaimImpl(claimId)
 }
+

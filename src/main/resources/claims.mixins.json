@@ -1,11 +1,29 @@
 {
   "required": true,
-  "package": "org.scofield.example.mixin",
+  "package": "org.scofield.claims.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
   ],
   "client": [
-    "ExampleMixin"
+    "ExampleMixin",
+    "PlayerClaimMixin",
+    "ServerWorldMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "AbstractBlockStateMixin",
+    "EntityMixin",
+    "ProjectileMixin",
+    "TurtleEggMixin",
+    "XpEntityMixin",
+    "WitherMixin",
+    "EnderPearlEntityMixin",
+    "IPersistentProjectileVars",
+    "LivingEntityMixin",
+    "ItemStackMixin",
+    "ILecternBlockValues",
+    "FluidMixin",
+    "PistonMixin",
+    "RaidManagerMixin",
+    "FireBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
