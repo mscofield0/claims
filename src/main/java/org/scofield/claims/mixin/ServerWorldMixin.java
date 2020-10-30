@@ -1,13 +1,17 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.IClaimData;
-import com.flemmli97.flan.claim.ClaimStorage;
-import com.flemmli97.flan.event.WorldEvents;
+import org.jetbrains.annotations.NotNull;
+import org.scofield.claims.claim.Claim;
+import org.scofield.claims.claim.storage.ClaimStorageFactory;
+import org.scofield.claims.claim.storage.ClaimStorageKt;
+import org.scofield.claims.claim.storage.sort_map.SortMap;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
+import org.scofield.claims.claim.storage.IClaimStorageContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,21 +20,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.UUID;
+
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin implements IClaimData {
+public abstract class ServerWorldMixin implements IClaimStorageContainer {
     @Unique
-    private ClaimStorage claimData;
+    private SortMap<UUID, Claim> claimStorage;
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initData(CallbackInfo info) {
         ServerWorld world = ((ServerWorld) (Object) this);
-        this.claimData = new ClaimStorage(world.getServer(), world);
+        this.claimStorage = ClaimStorageFactory.readFromSave(world.getServer(), world);
     }
 
     @Inject(method = "saveLevel()V", at = @At("RETURN"))
-    private void saveClaimData(CallbackInfo info) {
+    private void saveClaimStorage(CallbackInfo info) {
         ServerWorld world = ((ServerWorld) (Object) this);
-        this.claimData.save(world.getServer(), world.getRegistryKey());
+        ClaimStorageKt.save(this.claimStorage, world.getServer(), world);
     }
 
     @Inject(method = "createExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/explosion/Explosion;collectBlocksAndDamageEntities()V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
@@ -39,7 +45,7 @@ public abstract class ServerWorldMixin implements IClaimData {
     }
 
     @Override
-    public ClaimStorage getClaimData() {
-        return this.claimData;
+    public @NotNull SortMap<UUID, Claim> getClaimStorage() {
+        return this.claimStorage;
     }
 }

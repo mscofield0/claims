@@ -1,15 +1,36 @@
-package org.scofield.claims.claim
+package org.scofield.claims.claim.storage
 
-import net.minecraft.server.network.ServerPlayerEntity
-import org.scofield.claims.claim.sort_map.SortMap
-import org.scofield.claims.claim.sort_map.SortMapPriorityQueueKey
+import org.scofield.claims.claim.Claim
+import org.scofield.claims.claim.hasPermission
+import org.scofield.claims.claim.storage.sort_map.SortMap
+import org.scofield.claims.claim.storage.sort_map.SortMapPriorityQueueKey
+import org.scofield.claims.ext.isOp
+import org.scofield.claims.permission.ClaimPermission
 import org.scofield.claims.utils.Rect
 import org.scofield.claims.utils.intersects
 
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.WorldSavePath
+import net.minecraft.world.dimension.DimensionType
+import java.io.File
+import java.io.IOException
 import java.util.*
 import kotlin.NoSuchElementException
+import com.google.gson.Gson
+import java.io.FileWriter
 
 typealias ClaimStorage = SortMap<UUID, Claim>
+
+fun ClaimStorage.save(server: MinecraftServer, world: ServerWorld) {
+    val saveDir = DimensionType.getSaveDirectory(world.registryKey, server.getSavePath(WorldSavePath.ROOT).toFile())
+    val file = File(saveDir, "/data/claims/claims.json")
+
+    file.createNewFile()
+
+    Gson().toJson(this, FileWriter(file))
+}
 
 fun ClaimStorage.getClaim(claimId: UUID): Claim? {
     return this.valueMap[claimId]
@@ -123,12 +144,17 @@ private fun ClaimStorage.deleteClaimImpl(claimId: UUID) {
     this.layerMap.remove(SortMapPriorityQueueKey(0, claimId))
 }
 
-fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID) {
+fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID): Boolean {
     // Delete the subclaim item from the parent claim's subclaims list
     run {
         val claim = this.valueMap[claimId]!!
-        if (player.uuid != claim.ownerId) return false
 
+        // Check if the player has permissions to delete the claim
+        if (!(player.isOp() || claim.hasPermission(player.uuid, ClaimPermission.DELETE_CLAIM))) {
+            return false
+        }
+
+        // Delete the subclaim from the parent claim
         val parentId = claim.parentClaimId
         if (parentId != null) {
             val parentClaim = this.valueMap[parentId] ?: throw NoSuchElementException("This error shouldn't happen LOL!")
@@ -138,5 +164,7 @@ fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID) {
 
     // Delete this claim's subclaims recursively
     this.deleteClaimImpl(claimId)
+
+    return true
 }
 

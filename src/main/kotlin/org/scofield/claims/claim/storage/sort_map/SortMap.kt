@@ -1,4 +1,4 @@
-package org.scofield.claims.claim.sort_map
+package org.scofield.claims.claim.storage.sort_map
 
 import java.util.*
 

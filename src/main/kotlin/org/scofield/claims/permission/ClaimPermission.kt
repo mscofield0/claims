@@ -10,9 +10,10 @@ import java.util.*
  *
  * */
 enum class ClaimPermission {
-    USE_INTERACTABLE_BLOCKS,
-    OPEN_DOORS,
-
+    DELETE_CLAIM,
+    INTERACT_WITH_DOOR,
+    INTERACT_WITH_PRESSURE_PLATE,
+    INTERACT_WITH_NETHER_PORTAL,
 }
 
 typealias ClaimPermissions = EnumSet<ClaimPermission>

@@ -1,6 +1,7 @@
 package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.event.BlockInteractEvents;
+import org.scofield.claims.event_handlers.BlockInteract;
+
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -17,7 +18,7 @@ public abstract class AbstractBlockStateMixin {
 
     @Inject(method = "onEntityCollision", at = @At(value = "HEAD"), cancellable = true)
     public void collision(World world, BlockPos pos, Entity entity, CallbackInfo info) {
-        if (BlockInteractEvents.cancelEntityBlockCollision(this.asBlockState(), world, pos, entity)) {
+        if (BlockInteract.cancelEntityBlockCollision(this.asBlockState(), world, pos, entity)) {
             info.cancel();
         }
     }

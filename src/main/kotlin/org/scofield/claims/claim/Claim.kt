@@ -4,6 +4,8 @@ import org.scofield.claims.permission.*
 
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
+import org.scofield.claims.claim.storage.ClaimStorage
+import org.scofield.claims.claim.storage.getClaim
 import org.scofield.claims.ext.toPoint
 import org.scofield.claims.utils.*
 

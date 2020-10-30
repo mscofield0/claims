@@ -1,6 +1,4 @@
-package org.scofield.claims.claim.sort_map
-
-import java.util.*
+package org.scofield.claims.claim.storage.sort_map
 
 data class SortMapPriorityQueueKey<T>(
     val priority: Int,
