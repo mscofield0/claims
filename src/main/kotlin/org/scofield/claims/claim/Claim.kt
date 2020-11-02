@@ -34,6 +34,14 @@ data class Claim(
 infix fun Claim.intersects(other: Claim) = this.area intersects other.area
 infix fun Claim.contains(other: Claim) = this.area partOf other.area
 
+/**
+ * Checks if the player has a certain permission in the claim.
+ *
+ * @param playerId The player ID.
+ * @param perm The claim permission to check.
+ *
+ * @return A boolean indicating whether the player has the specified permission.
+ */
 fun Claim.hasPermission(playerId: UUID, perm: ClaimPermission): Boolean {
     // Checks if the player is the creator of the claim
     if (this.ownerId == playerId) return true
@@ -53,6 +61,19 @@ fun Claim.hasPermission(playerId: UUID, perm: ClaimPermission): Boolean {
     return false
 }
 
+/**
+ * Checks if the claim has a default permission.
+ *
+ * @param perm The claim permission to check.
+ *
+ * @return A boolean indicating whether the claim has a default permission.
+ */
+fun Claim.hasPermission(perm: ClaimPermission): Boolean = this.defaultPermissions.contains(perm)
+
+/**
+ * Checks if the player has sufficient permissions to interact with the claim.
+ *
+ */
 fun Claim.canPlayerInteract(storage: ClaimStorage, player: ServerPlayerEntity, perm: ClaimPermission, pos: BlockPos): Boolean {
     val point = pos.toPoint()
     return this.canPlayerInteract(storage, player, perm, point)

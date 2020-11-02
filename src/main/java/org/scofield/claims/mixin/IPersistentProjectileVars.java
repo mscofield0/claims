@@ -1,4 +1,4 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;

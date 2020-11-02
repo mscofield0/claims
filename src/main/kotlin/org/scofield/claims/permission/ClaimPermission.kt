@@ -11,9 +11,31 @@ import java.util.*
  * */
 enum class ClaimPermission {
     DELETE_CLAIM,
-    INTERACT_WITH_DOOR,
-    INTERACT_WITH_PRESSURE_PLATE,
-    INTERACT_WITH_NETHER_PORTAL,
+    DOOR_BLOCK,
+
+    // Block interact events
+    ABSTRACT_BUTTON_BLOCK,
+    ABSTRACT_PRESSURE_PLATE_BLOCK,
+    DETECTOR_RAIL_BLOCK,
+    END_PORTAL_BLOCK,
+    NETHER_PORTAL_BLOCK,
+    LILY_PAD_BLOCK,
+    TRIPWIRE_BLOCK,
+    WITHER_ROSE_BLOCK,
+
+    // Entity interact events
+    THROW_ENDER_PEARL,
+
+    // World events
+    FIRE_SPREAD,
+    WATER_FLOW,
+    LAVA_FLOW,
+
+    // Generic permissions for compatibility with other mods
+    GENERIC_FLUID_FLOW,
+    GENERIC_BLOCK_INTERACTION,
+    GENERIC_PROJECTILE_INTERACTION,
+    GENERIC_ENTITY_INTERACTION,
 }
 
 typealias ClaimPermissions = EnumSet<ClaimPermission>

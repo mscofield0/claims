@@ -1,6 +1,5 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.event.ItemInteractEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
@@ -14,7 +13,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "useOnBlock", at = @At(value = "HEAD"), cancellable = true)
     public void blockUse(ItemUsageContext context, CallbackInfoReturnable<ActionResult> info) {
-        ActionResult result = ItemInteractEvents.onItemUseBlock(context);
+        ActionResult result = ItemInteract.onItemUseBlock(context);
         if (result != ActionResult.PASS) {
             info.setReturnValue(result);
             info.cancel();

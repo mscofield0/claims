@@ -15,14 +15,21 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.WorldSavePath
 import net.minecraft.world.dimension.DimensionType
 import java.io.File
-import java.io.IOException
 import java.util.*
 import kotlin.NoSuchElementException
 import com.google.gson.Gson
+import org.scofield.claims.utils.Point
+import org.scofield.claims.utils.inside
 import java.io.FileWriter
 
 typealias ClaimStorage = SortMap<UUID, Claim>
 
+/**
+ * Saves the [ClaimStorage] into the world's save folder.
+ *
+ * @param server The Minecraft server.
+ * @param world The current [ServerWorld].
+ */
 fun ClaimStorage.save(server: MinecraftServer, world: ServerWorld) {
     val saveDir = DimensionType.getSaveDirectory(world.registryKey, server.getSavePath(WorldSavePath.ROOT).toFile())
     val file = File(saveDir, "/data/claims/claims.json")
@@ -32,6 +39,13 @@ fun ClaimStorage.save(server: MinecraftServer, world: ServerWorld) {
     Gson().toJson(this, FileWriter(file))
 }
 
+/**
+ * Gets the claim from the [valueMap].
+ *
+ * @param claimId The claim's ID.
+ *
+ * @return The claim or null if it doesn't exist.
+ */
 fun ClaimStorage.getClaim(claimId: UUID): Claim? {
     return this.valueMap[claimId]
 }
@@ -90,6 +104,9 @@ fun ClaimStorage.getCollidingClaim(playerId: UUID, claim: Claim): Pair<Int, UUID
 /**
  * Creates a new claim.
  *
+ * @param player The player creating the claim.
+ * @param area The area the claim should be covering.
+ *
  * @throws StackOverflowError If the [generateUuid] function recurses for long enough.
  *
  * @return A boolean indicating if the creation was successful
@@ -144,6 +161,14 @@ private fun ClaimStorage.deleteClaimImpl(claimId: UUID) {
     this.layerMap.remove(SortMapPriorityQueueKey(0, claimId))
 }
 
+/**
+ * Deletes the claim if the player has sufficient permissions.
+ *
+ * @param player The player deleting the claim.
+ * @param claimId The claim's ID.
+ *
+ * @return A boolean indicating if the claim was deleted or not.
+ */
 fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID): Boolean {
     // Delete the subclaim item from the parent claim's subclaims list
     run {
@@ -168,3 +193,18 @@ fun ClaimStorage.deleteClaim(player: ServerPlayerEntity, claimId: UUID): Boolean
     return true
 }
 
+/**
+ * Finds a claim at the given position
+ *
+ * @param point 2D point indicating the flat position in the world
+ *
+ * @return The found claim or null if no claim was found.
+ */
+fun ClaimStorage.claimAtPos(point: Point): Claim? {
+    for ((_, key) in this.layerMap) {
+        val claim = this.valueMap[key]!!
+        if (point inside claim.area) return claim
+    }
+
+    return null
+}

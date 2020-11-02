@@ -12,6 +12,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
 import org.scofield.claims.claim.storage.IClaimStorageContainer;
+import org.scofield.claims.event_handlers.WorldEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,7 +46,7 @@ public abstract class ServerWorldMixin implements IClaimStorageContainer {
     }
 
     @Override
-    public @NotNull SortMap<UUID, Claim> getClaimStorage() {
+    public @NotNull SortMap<UUID, Claim> getClaimStorageData() {
         return this.claimStorage;
     }
 }

@@ -1,6 +1,8 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.event.WorldEvents;
+import net.minecraft.server.world.ServerWorld;
+import org.scofield.claims.event_handlers.WorldEvents;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
@@ -17,9 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FluidMixin {
 
     @Inject(method = "canFlow", at = @At(value = "HEAD"), cancellable = true)
-    public void crossClaimFlow(BlockView world, BlockPos fluidPos, BlockState fluidBlockState, Direction flowDirection, BlockPos flowTo,
+    public void flow(BlockView world, BlockPos fluidPos, BlockState fluidBlockState, Direction flowDirection, BlockPos flowTo,
                                BlockState flowToBlockState, FluidState fluidState, Fluid fluid, CallbackInfoReturnable<Boolean> info) {
-        if (!WorldEvents.canFlow(fluidBlockState, world, fluidPos, flowDirection)) {
+        if (!WorldEvents.permitFluidFlow(fluidBlockState, (ServerWorld) world, fluidPos, flowDirection)) {
             info.setReturnValue(false);
             info.cancel();
         }

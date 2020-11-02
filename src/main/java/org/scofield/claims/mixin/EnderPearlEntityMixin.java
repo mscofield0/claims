@@ -1,6 +1,7 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.event.EntityInteractEvents;
+import org.scofield.claims.event_handlers.EntityInteract;
+
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.util.hit.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +14,7 @@ public abstract class EnderPearlEntityMixin {
 
     @Inject(method = "onCollision", at = @At(value = "HEAD"), cancellable = true)
     public void collision(HitResult hitResult, CallbackInfo info) {
-        if (EntityInteractEvents.projectileHit((EnderPearlEntity) (Object) this, hitResult)) {
+        if (EntityInteract.permitProjectileHit((EnderPearlEntity) (Object) this, hitResult)) {
             info.cancel();
         }
     }
