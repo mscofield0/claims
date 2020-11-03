@@ -10,6 +10,7 @@ import java.util.*
  *
  * */
 enum class ClaimPermission {
+
     DELETE_CLAIM,
     DOOR_BLOCK,
 
@@ -22,6 +23,8 @@ enum class ClaimPermission {
     LILY_PAD_BLOCK,
     TRIPWIRE_BLOCK,
     WITHER_ROSE_BLOCK,
+    PLACE_BLOCKS,
+    REMOVE_BLOCKS,
 
     // Entity interact events
     THROW_ENDER_PEARL,

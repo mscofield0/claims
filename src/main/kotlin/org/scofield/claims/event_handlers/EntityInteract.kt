@@ -2,9 +2,13 @@
 
 package org.scofield.claims.event_handlers
 
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.projectile.ProjectileEntity
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
+import org.apache.logging.log4j.core.jmx.Server
 import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.claim.storage.claimAtPos
 
@@ -31,4 +35,16 @@ fun permitProjectileHit(projectile: ProjectileEntity, hitResult: HitResult): Boo
     val neededPermission = EntityInteractEventPermissionMap.PROJECTILE_PERMISSION_MAP[entityType] ?: return false
 
     return claim.hasPermission(owner.uuid, neededPermission)
+}
+
+fun permitPreventDamage(entity: LivingEntity, damageSource: DamageSource): Boolean {
+    val attacker = damageSource.attacker
+
+    if (attacker != null) {
+        when(attacker) {
+            is ServerPlayerEntity -> {
+
+            }
+        }
+    }
 }
