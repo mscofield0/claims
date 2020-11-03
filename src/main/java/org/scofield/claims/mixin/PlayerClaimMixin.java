@@ -1,10 +1,10 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.IClaimData;
-import com.flemmli97.flan.player.PlayerClaimData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.scofield.claims.claim.storage.IClaimDataContainer;
+import org.scofield.claims.claim.storage.PlayerClaimData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class PlayerClaimMixin implements IClaimData {
+public abstract class PlayerClaimMixin implements IClaimDataContainer {
     @Unique
     private PlayerClaimData claimData;
 
@@ -23,7 +23,7 @@ public abstract class PlayerClaimMixin implements IClaimData {
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initData(CallbackInfo info) {
-        this.claimData = new PlayerClaimData((ServerPlayerEntity) (Object) this);
+        this.claimData = new ;
     }
 
     @Inject(method = "readCustomDataFromTag", at = @At("RETURN"))

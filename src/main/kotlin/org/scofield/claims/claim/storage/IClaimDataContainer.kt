@@ -1,5 +1,5 @@
 package org.scofield.claims.claim.storage
 
-interface IClaimStorageContainer {
+interface IClaimDataContainer {
     fun getClaimStorageData(): Any
 }

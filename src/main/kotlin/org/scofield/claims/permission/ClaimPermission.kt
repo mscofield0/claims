@@ -31,8 +31,11 @@ enum class ClaimPermission {
 
     // World events
     FIRE_SPREAD,
+    EXPLOSIONS,
     WATER_FLOW,
     LAVA_FLOW,
+    INTERCLAIM_PISTON_PUSH_PULL,
+    INTERCLAIM_PISTON_DESTROY,
 
     // Generic permissions for compatibility with other mods
     GENERIC_FLUID_FLOW,
