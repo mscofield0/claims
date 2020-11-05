@@ -18,7 +18,7 @@ public abstract class AbstractBlockStateMixin {
 
     @Inject(method = "onEntityCollision", at = @At(value = "HEAD"), cancellable = true)
     public void collision(World world, BlockPos pos, Entity entity, CallbackInfo info) {
-        if (BlockInteract.permitEntityBlockCollision(this.asBlockState(), world, pos, entity)) {
+        if (!BlockInteract.permitEntityBlockCollision(this.asBlockState(), world, pos, entity)) {
             info.cancel();
         }
     }

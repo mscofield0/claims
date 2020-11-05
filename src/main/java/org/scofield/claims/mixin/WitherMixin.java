@@ -1,7 +1,7 @@
-package com.flemmli97.flan.mixin;
+package org.scofield.claims.mixin;
 
-import com.flemmli97.flan.event.EntityInteractEvents;
 import net.minecraft.entity.boss.WitherEntity;
+import org.scofield.claims.event_handlers.EntityInteract;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,8 +15,9 @@ public abstract class WitherMixin {
     private int field_7082;
 
     @Inject(method = "mobTick", at = @At(value = "HEAD"))
-    public void preventClaimDmg(CallbackInfo info) {
-        if (!EntityInteractEvents.witherCanDestroy((WitherEntity) (Object) this))
+    public void preventClaimDamage(CallbackInfo info) {
+        if (!EntityInteract.permitWitherDestruction((WitherEntity) (Object) this)) {
             this.field_7082 = -1;
+        }
     }
 }

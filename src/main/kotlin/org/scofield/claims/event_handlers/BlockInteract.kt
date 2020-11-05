@@ -7,9 +7,9 @@ import net.minecraft.entity.Entity
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.entity.projectile.ProjectileEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.world.World
 import org.scofield.claims.claim.hasPermission
-import org.scofield.claims.claim.storage.claimAtPos
 import org.scofield.claims.ext.getClaimStorage
 import org.scofield.claims.ext.toPermissionCheckType
 import org.scofield.claims.ext.toPoint
@@ -43,4 +43,26 @@ fun permitEntityBlockCollision(state: BlockState, world: World, pos: BlockPos, e
     }
 
     return true
+}
+
+fun permitBreakTurtleEgg(world: ServerWorld, blockPos: BlockPos, entity: Entity): Boolean {
+    val claimStorage = world.getClaimStorage()
+    val pos = blockPos.toPoint()
+    val claim = claimStorage.claimAtPos(pos) ?: return true
+
+    return when(entity) {
+        is ServerPlayerEntity -> claim.hasPermission(entity.uuid, ClaimPermission.TRAMPLE_TURTLE_EGG)
+        is ProjectileEntity -> {
+            val owner = entity.owner
+            if (owner is ServerPlayerEntity) {
+                claim.hasPermission(owner.uuid, ClaimPermission.TRAMPLE_TURTLE_EGG)
+            } else {
+                false
+            }
+        }
+
+        // Any other entity interacting with the block should fail, as there is no way to
+        // detect if the entity has been manipulated by a player.
+        else -> false
+    }
 }

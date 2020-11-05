@@ -13,7 +13,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "damage", at = @At(value = "HEAD"), cancellable = true)
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> info) {
-        if (EntityInteract.permitPreventDamage((LivingEntity) (Object) this, source)) {
+        if (!EntityInteract.permitPreventDamage((LivingEntity) (Object) this, source)) {
             info.setReturnValue(false);
             info.cancel();
         }

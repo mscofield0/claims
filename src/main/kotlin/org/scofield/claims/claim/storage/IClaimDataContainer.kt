@@ -1,5 +1,8 @@
 package org.scofield.claims.claim.storage
 
+import java.util.*
+
 interface IClaimDataContainer {
-    fun getClaimStorageData(): Any
+    fun getClaimData_(): PlayerClaimData
+    fun getPlayerUUID(): UUID
 }

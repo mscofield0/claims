@@ -2,6 +2,6 @@ package org.scofield.claims.ext
 
 import net.minecraft.server.world.ServerWorld
 import org.scofield.claims.claim.storage.ClaimStorage
-import org.scofield.claims.claim.storage.IClaimDataContainer
+import org.scofield.claims.claim.storage.IClaimStorageContainer
 
-fun ServerWorld.getClaimStorage(): ClaimStorage = ((this as IClaimDataContainer).getClaimStorageData()) as ClaimStorage
+fun ServerWorld.getClaimStorage(): ClaimStorage = (this as IClaimStorageContainer).getClaimStorage_()

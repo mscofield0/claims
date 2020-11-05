@@ -4,13 +4,12 @@ package org.scofield.claims.event_handlers
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.piston.PistonBehavior
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.world.BlockView
 import net.minecraft.world.explosion.Explosion
 import org.scofield.claims.claim.hasPermission
-import org.scofield.claims.claim.storage.claimAtPos
 import org.scofield.claims.ext.getClaimStorage
 import org.scofield.claims.ext.toPermissionCheckType
 import org.scofield.claims.ext.toPoint
@@ -62,4 +61,12 @@ fun permitPistonPushPull(state: BlockState, world: ServerWorld, pos: BlockPos, d
         }
         else -> to.hasPermission(ClaimPermission.INTERCLAIM_PISTON_PUSH_PULL)
     }
+}
+
+fun permitStartRaid(world: ServerWorld, player: ServerPlayerEntity): Boolean {
+    val claimStorage = world.getClaimStorage()
+    val pos = player.blockPos.toPoint()
+    val claim = claimStorage.claimAtPos(pos) ?: return true
+
+    return claim.hasPermission(player.uuid, ClaimPermission.START_RAID)
 }

@@ -25,9 +25,18 @@ enum class ClaimPermission {
     WITHER_ROSE_BLOCK,
     PLACE_BLOCKS,
     REMOVE_BLOCKS,
+    TRAMPLE_TURTLE_EGG,
 
     // Entity interact events
     THROW_ENDER_PEARL,
+    ENTER_BOAT,
+    ACCESS_MINECART_CHEST,
+    ENTER_MINECART,
+    TRADE_WITH_VILLAGER,
+    ROTATE_ITEM_FRAME,
+    INTERACT_WITH_ANIMALS,
+    ATTACK_ENTITY,
+    ABSORB_XP,
 
     // World events
     FIRE_SPREAD,
@@ -36,6 +45,7 @@ enum class ClaimPermission {
     LAVA_FLOW,
     INTERCLAIM_PISTON_PUSH_PULL,
     INTERCLAIM_PISTON_DESTROY,
+    START_RAID,
 
     // Generic permissions for compatibility with other mods
     GENERIC_FLUID_FLOW,

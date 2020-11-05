@@ -14,7 +14,7 @@ public abstract class EnderPearlEntityMixin {
 
     @Inject(method = "onCollision", at = @At(value = "HEAD"), cancellable = true)
     public void collision(HitResult hitResult, CallbackInfo info) {
-        if (EntityInteract.permitProjectileHit((EnderPearlEntity) (Object) this, hitResult)) {
+        if (!EntityInteract.permitProjectileHit((EnderPearlEntity) (Object) this, hitResult)) {
             info.cancel();
         }
     }
