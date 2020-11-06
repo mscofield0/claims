@@ -4,10 +4,14 @@ package org.scofield.claims.event_handlers
 
 import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.ActionResult
+import net.minecraft.util.Hand
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.world.World
 import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.ext.getClaimStorage
@@ -35,6 +39,7 @@ fun permitEntityBlockCollision(state: BlockState, world: World, pos: BlockPos, e
             // If the projectile has no owner, it originated from an automated source
             // thus we need to cancel the event as it poses a security risk.
             val owner = entity.owner ?: return false
+            if (owner !is ServerPlayerEntity) return true
 
             val neededPermission = BlockInteractEventPermissionMap.PROJECTILE_PERMISSION_MAP[blockType] ?: return false
 
@@ -64,5 +69,24 @@ fun permitBreakTurtleEgg(world: ServerWorld, blockPos: BlockPos, entity: Entity)
         // Any other entity interacting with the block should fail, as there is no way to
         // detect if the entity has been manipulated by a player.
         else -> false
+    }
+}
+
+fun permitUseBlocks(player: PlayerEntity, world: World, hand: Hand, hitResult: BlockHitResult): ActionResult {
+    val player = player as ServerPlayerEntity
+    val world = world as ServerWorld
+
+    // [NOTE] - Perhaps add claiming sticks for QOL
+
+    val claimStorage = world.getClaimStorage()
+    val pos = hitResult.blockPos.toPoint()
+    val claim = claimStorage.claimAtPos(pos) ?: return ActionResult.PASS
+
+    val itemStack = player.getStackInHand(hand)
+    val itemType = itemStack.item
+    val playerIsCrouched = player.shouldCancelInteraction()
+    if (playerIsCrouched || itemStack)
+    if (itemStack.isEmpty) {
+
     }
 }
