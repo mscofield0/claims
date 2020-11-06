@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.entity.projectile.ProjectileEntity
+import net.minecraft.item.BlockItem
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
@@ -83,10 +84,19 @@ fun permitUseBlocks(player: PlayerEntity, world: World, hand: Hand, hitResult: B
     val claim = claimStorage.claimAtPos(pos) ?: return ActionResult.PASS
 
     val itemStack = player.getStackInHand(hand)
-    val itemType = itemStack.item
+    val itemTypeIsBlockItem = itemStack.item is BlockItem
     val playerIsCrouched = player.shouldCancelInteraction()
-    if (playerIsCrouched || itemStack)
-    if (itemStack.isEmpty) {
-
+    return if (playerIsCrouched) {
+        if (itemStack.isEmpty) {
+            if (claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)) ActionResult.PASS
+            else ActionResult.FAIL
+        } else {
+            if (claim.hasPermission(player.uuid, ClaimPermission.PLACE_BLOCKS)) ActionResult.PASS
+            else ActionResult.FAIL
+        }
+    } else {
+        if (claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)) ActionResult.PASS
+        else ActionResult.FAIL
     }
+
 }

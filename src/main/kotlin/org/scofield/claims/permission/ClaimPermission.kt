@@ -10,9 +10,8 @@ import java.util.*
  *
  * */
 enum class ClaimPermission {
-
+    // Claim manipulation
     DELETE_CLAIM,
-    DOOR_BLOCK,
 
     // Block interact events
     ABSTRACT_BUTTON_BLOCK,
@@ -26,6 +25,8 @@ enum class ClaimPermission {
     PLACE_BLOCKS,
     REMOVE_BLOCKS,
     TRAMPLE_TURTLE_EGG,
+    OPEN_STORAGE,
+    OPEN_DOOR,
 
     // Entity interact events
     THROW_ENDER_PEARL,
