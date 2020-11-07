@@ -2,9 +2,9 @@
 
 package org.scofield.claims.event_handlers
 
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
+import net.minecraft.block.*
 import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.entity.LootableContainerBlockEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
@@ -77,9 +77,12 @@ fun permitBreakTurtleEgg(world: ServerWorld, blockPos: BlockPos, entity: Entity)
     }
 }
 
-fun handleInteractiveBlocks(block: Block, player: ServerPlayerEntity, claim: Claim): Boolean {
-    return when(block) {
-        is  -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)
+fun handleInteractiveBlocks(blockEntity: BlockEntity?, player: ServerPlayerEntity, claim: Claim): Boolean {
+    if (blockEntity == null) return false
+
+    return when(blockEntity) {
+        is LootableContainerBlockEntity -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)
+        is DoorBlock
     }
 }
 
@@ -94,19 +97,19 @@ fun permitUseBlocks(player: PlayerEntity, world: World, hand: Hand, hitResult: B
     val claim = claimStorage.claimAtPos(pos) ?: return ActionResult.PASS
 
     val itemStack = player.getStackInHand(hand)
-    val block = world.getBlockState(hitResult.blockPos).block
+    val blockEntity = world.getBlockEntity(hitResult.blockPos)
     val playerIsCrouched = player.shouldCancelInteraction()
 
     return if (playerIsCrouched) {
         if (itemStack.isEmpty) {
-            if (handleInteractiveBlocks(block, player, claim)) ActionResult.PASS
+            if (handleInteractiveBlocks(blockEntity, player, claim)) ActionResult.PASS
             else ActionResult.FAIL
         } else {
             if (claim.hasPermission(player.uuid, ClaimPermission.PLACE_BLOCKS)) ActionResult.PASS
             else ActionResult.FAIL
         }
     } else {
-        if (handleInteractiveBlocks(block, player, claim)) ActionResult.PASS
+        if (handleInteractiveBlocks(blockEntity, player, claim)) ActionResult.PASS
         else ActionResult.FAIL
     }
 }
