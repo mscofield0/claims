@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.boss.WitherEntity
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.decoration.ItemFrameEntity
 import net.minecraft.entity.passive.AnimalEntity
 import net.minecraft.entity.passive.TameableEntity
@@ -62,6 +63,7 @@ fun permitEntityInteractionWithHand(world: ServerWorld, player: ServerPlayerEnti
         is ItemFrameEntity -> claim.hasPermission(player.uuid, ClaimPermission.ROTATE_ITEM_FRAME)
         is TameableEntity -> entity.isOwner(player)
         is AnimalEntity -> claim.hasPermission(player.uuid, ClaimPermission.INTERACT_WITH_ANIMALS)
+        is ArmorStandEntity -> claim.hasPermission(player.uuid, ClaimPermission.INTERACT_WITH_ARMOR_STAND)
 
         // If it is an unchecked entity, it is better just to deny the interaction rather than allowing a
         // potential security breach.
@@ -80,9 +82,16 @@ fun permitPreventDamage(entity: LivingEntity, damageSource: DamageSource): Boole
     // on the correct trajectory from where the Dispenser is attacking.
     //
     // Marked as Will Not Solve until a good reason
-    val attacker = entity.attacker ?: return false
+    val attacker = damageSource.attacker ?: return false
+
     return if (attacker is ServerPlayerEntity) {
-        !claim.hasPermission(attacker.uuid, ClaimPermission.ATTACK_ENTITY)
+        when(entity) {
+            is ServerPlayerEntity -> claim.hasPermission(attacker.uuid, ClaimPermission.ATTACK_PLAYER)
+            is AnimalEntity -> claim.hasPermission(attacker.uuid, ClaimPermission.ATTACK_ANIMAL)
+
+            // Breaking a boat, a minecart, etc...
+            else -> claim.hasPermission(attacker.uuid, ClaimPermission.REMOVE_BLOCKS)
+        }
     } else {
         false
     }

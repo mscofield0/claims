@@ -36,8 +36,10 @@ enum class ClaimPermission {
     TRADE_WITH_VILLAGER,
     ROTATE_ITEM_FRAME,
     INTERACT_WITH_ANIMALS,
-    ATTACK_ENTITY,
+    ATTACK_PLAYER,
+    ATTACK_ANIMAL,
     ABSORB_XP,
+    INTERACT_WITH_ARMOR_STAND,
 
     // World events
     FIRE_SPREAD,

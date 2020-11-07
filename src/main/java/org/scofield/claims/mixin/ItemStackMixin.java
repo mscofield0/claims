@@ -15,7 +15,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "useOnBlock", at = @At(value = "HEAD"), cancellable = true)
     public void blockUse(ItemUsageContext context, CallbackInfoReturnable<ActionResult> info) {
-        if (!ItemInteract.permitUseBlockItem(context)) {
+        if (!ItemInteract.permitUseItem(context)) {
             info.setReturnValue(ActionResult.FAIL);
             info.cancel();
         }

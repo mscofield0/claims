@@ -2,18 +2,22 @@
 
 package org.scofield.claims.event_handlers
 
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.entity.BlockEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.item.BlockItem
+import net.minecraft.item.Item
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.world.World
+import org.scofield.claims.claim.Claim
 import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.ext.getClaimStorage
 import org.scofield.claims.ext.toPermissionCheckType
@@ -73,6 +77,12 @@ fun permitBreakTurtleEgg(world: ServerWorld, blockPos: BlockPos, entity: Entity)
     }
 }
 
+fun handleInteractiveBlocks(block: Block, player: ServerPlayerEntity, claim: Claim): Boolean {
+    return when(block) {
+        is  -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)
+    }
+}
+
 fun permitUseBlocks(player: PlayerEntity, world: World, hand: Hand, hitResult: BlockHitResult): ActionResult {
     val player = player as ServerPlayerEntity
     val world = world as ServerWorld
@@ -84,19 +94,29 @@ fun permitUseBlocks(player: PlayerEntity, world: World, hand: Hand, hitResult: B
     val claim = claimStorage.claimAtPos(pos) ?: return ActionResult.PASS
 
     val itemStack = player.getStackInHand(hand)
-    val itemTypeIsBlockItem = itemStack.item is BlockItem
+    val block = world.getBlockState(hitResult.blockPos).block
     val playerIsCrouched = player.shouldCancelInteraction()
+
     return if (playerIsCrouched) {
         if (itemStack.isEmpty) {
-            if (claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)) ActionResult.PASS
+            if (handleInteractiveBlocks(block, player, claim)) ActionResult.PASS
             else ActionResult.FAIL
         } else {
             if (claim.hasPermission(player.uuid, ClaimPermission.PLACE_BLOCKS)) ActionResult.PASS
             else ActionResult.FAIL
         }
     } else {
-        if (claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)) ActionResult.PASS
+        if (handleInteractiveBlocks(block, player, claim)) ActionResult.PASS
         else ActionResult.FAIL
     }
+}
 
+fun permitBreakBlocks(world: World, player: PlayerEntity, blockPos: BlockPos, blockState: BlockState, blockEntity: BlockEntity): Boolean{
+    val player = player as ServerPlayerEntity
+    val world = world as ServerWorld
+    val claimStorage = world.getClaimStorage()
+    val pos = blockPos.toPoint()
+    val claim = claimStorage.claimAtPos(pos) ?: return true
+
+    return claim.hasPermission(player.uuid, ClaimPermission.REMOVE_BLOCKS)
 }
