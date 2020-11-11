@@ -34,7 +34,7 @@ dependencies {
 
     implementation "org.kodein.di:kodein-di:${project.kodein_version}"
 
-    implementation 'com.github.mscofield0:claims-types:1.0.0'
+    implementation 'com.github.mscofield0:claims-types:init'
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

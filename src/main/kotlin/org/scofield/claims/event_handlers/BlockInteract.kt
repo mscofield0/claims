@@ -2,16 +2,19 @@
 
 package org.scofield.claims.event_handlers
 
-import net.minecraft.block.*
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.block.LecternBlock
 import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.LootableContainerBlockEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.entity.projectile.ProjectileEntity
 import net.minecraft.item.BlockItem
-import net.minecraft.item.Item
+import net.minecraft.item.BookItem
+import net.minecraft.item.WritableBookItem
+import net.minecraft.item.WrittenBookItem
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
@@ -25,6 +28,9 @@ import org.scofield.claims.ext.toPoint
 import org.scofield.claims.ext.toServerWorld
 import org.scofield.claims.permission.BlockInteractEventPermissionMap
 import org.scofield.claims.permission.ClaimPermission
+import org.scofield.claims.types.Door
+import org.scofield.claims.types.Storage
+import org.scofield.claims.types.Workbench
 
 fun permitEntityBlockCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity): Boolean {
     val claimStorage = world.toServerWorld().getClaimStorage()
@@ -77,12 +83,37 @@ fun permitBreakTurtleEgg(world: ServerWorld, blockPos: BlockPos, entity: Entity)
     }
 }
 
-fun handleInteractiveBlocks(blockEntity: BlockEntity?, player: ServerPlayerEntity, claim: Claim): Boolean {
-    if (blockEntity == null) return false
+fun handleInteractiveBlocks(blockState: BlockState, player: ServerPlayerEntity, claim: Claim): Boolean {
+    return when(blockState.block) {
+        is Storage -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)
+        is Door -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_DOOR)
+        is Workbench -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_WORKBENCH)
+        is LecternBlock -> {
+            // Check if there is a book on the Lectern
+            val hasBook = blockState.get(LecternBlock.HAS_BOOK)
+            return if (hasBook) {
+                claim.hasPermission(player.uuid, ClaimPermission.OPEN_LECTERN)
+            } else {
+                val mainHandStack = player.mainHandStack
+                val offHandStack = player.offHandStack
+                val mainHandItem = mainHandStack.item
+                val offHandItem = offHandStack.item
 
-    return when(blockEntity) {
-        is LootableContainerBlockEntity -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)
-        is DoorBlock
+                when(mainHandItem) {
+                    is BookItem, is WritableBookItem, is WrittenBookItem
+                        -> return claim.hasPermission(player.uuid, ClaimPermission.PLACE_LECTERN_BOOK)
+                }
+
+                return when(offHandItem) {
+                    is BookItem, is WritableBookItem, is WrittenBookItem -> {
+                        return if (mainHandItem is BlockItem) true
+                        else claim.hasPermission(player.uuid, ClaimPermission.PLACE_LECTERN_BOOK)
+                    }
+                    else -> true
+                }
+            }
+        }
+        else -> claim.hasPermission(player.uuid, ClaimPermission.OTHER_INTERACTABLE_BLOCKS)
     }
 }
 
@@ -97,19 +128,19 @@ fun permitUseBlocks(player: PlayerEntity, world: World, hand: Hand, hitResult: B
     val claim = claimStorage.claimAtPos(pos) ?: return ActionResult.PASS
 
     val itemStack = player.getStackInHand(hand)
-    val blockEntity = world.getBlockEntity(hitResult.blockPos)
+    val blockState = world.getBlockState(hitResult.blockPos)
     val playerIsCrouched = player.shouldCancelInteraction()
 
     return if (playerIsCrouched) {
         if (itemStack.isEmpty) {
-            if (handleInteractiveBlocks(blockEntity, player, claim)) ActionResult.PASS
+            if (handleInteractiveBlocks(blockState, player, claim)) ActionResult.PASS
             else ActionResult.FAIL
         } else {
             if (claim.hasPermission(player.uuid, ClaimPermission.PLACE_BLOCKS)) ActionResult.PASS
             else ActionResult.FAIL
         }
     } else {
-        if (handleInteractiveBlocks(blockEntity, player, claim)) ActionResult.PASS
+        if (handleInteractiveBlocks(blockState, player, claim)) ActionResult.PASS
         else ActionResult.FAIL
     }
 }

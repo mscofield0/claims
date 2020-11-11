@@ -27,6 +27,11 @@ enum class ClaimPermission {
     TRAMPLE_TURTLE_EGG,
     OPEN_STORAGE,
     OPEN_DOOR,
+    OPEN_WORKBENCH,
+    OPEN_LECTERN,
+    TAKE_LECTERN_BOOK,
+    PLACE_LECTERN_BOOK,
+    OTHER_INTERACTABLE_BLOCKS,
 
     // Entity interact events
     THROW_ENDER_PEARL,
