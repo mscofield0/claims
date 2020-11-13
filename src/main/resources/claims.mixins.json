@@ -5,6 +5,8 @@
   "mixins": [
     "AbstractChestBlockMixin",
     "DoorBlockMixin",
+    "FenceGateBlockMixin",
+    "ShulkerBoxBlockMixin",
     "TrapdoorBlockMixin"
   ],
   "client": [
