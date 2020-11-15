@@ -19,7 +19,6 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
-import org.scofield.claims.claim.hasPermission
 
 import org.scofield.claims.ext.toPoint
 import org.scofield.claims.ext.toServerWorld

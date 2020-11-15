@@ -7,12 +7,9 @@
     "DoorBlockMixin",
     "FenceGateBlockMixin",
     "ShulkerBoxBlockMixin",
-    "TrapdoorBlockMixin"
-  ],
-  "client": [
+    "TrapdoorBlockMixin",
     "AbstractBlockStateMixin",
     "EnderPearlEntityMixin",
-    "EntityMixin",
     "ExampleMixin",
     "FireBlockMixin",
     "FluidMixin",

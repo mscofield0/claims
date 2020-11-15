@@ -2,7 +2,6 @@
 
 package org.scofield.claims.event_handlers
 
-import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.LecternBlock
 import net.minecraft.block.entity.BlockEntity
@@ -21,16 +20,13 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.world.World
 import org.scofield.claims.claim.Claim
-import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.ext.getClaimStorage
 import org.scofield.claims.ext.toPermissionCheckType
 import org.scofield.claims.ext.toPoint
 import org.scofield.claims.ext.toServerWorld
 import org.scofield.claims.permission.BlockInteractEventPermissionMap
 import org.scofield.claims.permission.ClaimPermission
-import org.scofield.claims.types.Door
-import org.scofield.claims.types.Storage
-import org.scofield.claims.types.Workbench
+import org.scofield.claims.types.*
 
 fun permitEntityBlockCollision(state: BlockState, world: World, pos: BlockPos, entity: Entity): Boolean {
     val claimStorage = world.toServerWorld().getClaimStorage()
@@ -88,16 +84,16 @@ fun handleInteractiveBlocks(blockState: BlockState, player: ServerPlayerEntity, 
         is Storage -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_STORAGE)
         is Door -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_DOOR)
         is Workbench -> claim.hasPermission(player.uuid, ClaimPermission.OPEN_WORKBENCH)
+        is Food -> claim.hasPermission(player.uuid, ClaimPermission.EAT_FOOD)
+        is Redstone -> claim.hasPermission(player.uuid, ClaimPermission.INTERACT_WITH_REDSTONE)
         is LecternBlock -> {
             // Check if there is a book on the Lectern
             val hasBook = blockState.get(LecternBlock.HAS_BOOK)
             return if (hasBook) {
                 claim.hasPermission(player.uuid, ClaimPermission.OPEN_LECTERN)
             } else {
-                val mainHandStack = player.mainHandStack
-                val offHandStack = player.offHandStack
-                val mainHandItem = mainHandStack.item
-                val offHandItem = offHandStack.item
+                val mainHandItem = player.mainHandStack.item
+                val offHandItem = player.offHandStack.item
 
                 when(mainHandItem) {
                     is BookItem, is WritableBookItem, is WrittenBookItem
@@ -113,7 +109,7 @@ fun handleInteractiveBlocks(blockState: BlockState, player: ServerPlayerEntity, 
                 }
             }
         }
-        else -> claim.hasPermission(player.uuid, ClaimPermission.OTHER_INTERACTABLE_BLOCKS)
+        else -> claim.hasPermission(player.uuid, ClaimPermission.INTERACT_WITH_MISC_BLOCKS)
     }
 }
 

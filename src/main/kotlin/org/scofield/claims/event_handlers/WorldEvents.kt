@@ -9,7 +9,6 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.explosion.Explosion
-import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.ext.getClaimStorage
 import org.scofield.claims.ext.toPermissionCheckType
 import org.scofield.claims.ext.toPoint

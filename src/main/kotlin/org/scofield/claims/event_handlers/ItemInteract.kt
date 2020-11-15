@@ -2,11 +2,8 @@
 
 package org.scofield.claims.event_handlers
 
-import net.minecraft.item.BucketItem
 import net.minecraft.item.ItemUsageContext
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.ActionResult
-import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.ext.getClaimStorage
 import org.scofield.claims.ext.toPoint
 import org.scofield.claims.ext.toServerWorld

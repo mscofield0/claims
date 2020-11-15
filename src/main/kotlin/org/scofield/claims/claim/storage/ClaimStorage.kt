@@ -1,7 +1,6 @@
 package org.scofield.claims.claim.storage
 
 import org.scofield.claims.claim.Claim
-import org.scofield.claims.claim.hasPermission
 import org.scofield.claims.ext.isOp
 import org.scofield.claims.permission.ClaimPermission
 import org.scofield.claims.utils.Rect

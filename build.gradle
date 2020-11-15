@@ -16,8 +16,9 @@ minecraft {
 
 
 repositories {
-    maven { url = "http://maven.fabricmc.net/" }
-    maven { url 'https://jitpack.io' }
+    maven { url "http://maven.fabricmc.net/" }
+    maven { url "https://jitpack.io" }
+    maven { url "https://dl.bintray.com/hotkeytlt/maven" }
     jcenter()
 }
 
@@ -34,7 +35,9 @@ dependencies {
 
     implementation "org.kodein.di:kodein-di:${project.kodein_version}"
 
-    implementation 'com.github.mscofield0:claims-types:init'
+    implementation "com.github.h0tk3y.betterParse:better-parse:${project.better_parse_version}"
+
+    implementation "com.github.mscofield0:claims-types:${project.claims_types_tag}"
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

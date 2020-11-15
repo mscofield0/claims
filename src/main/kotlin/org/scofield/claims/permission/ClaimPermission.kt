@@ -31,7 +31,9 @@ enum class ClaimPermission {
     OPEN_LECTERN,
     TAKE_LECTERN_BOOK,
     PLACE_LECTERN_BOOK,
-    OTHER_INTERACTABLE_BLOCKS,
+    EAT_FOOD,
+    INTERACT_WITH_REDSTONE,
+    INTERACT_WITH_MISC_BLOCKS,
 
     // Entity interact events
     THROW_ENDER_PEARL,
