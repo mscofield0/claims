@@ -25,7 +25,9 @@ class CommandSet {
                 .then(
                     CommandManager.argument("fromX", IntegerArgumentType.integer()).then(
                         CommandManager.argument("fromY", IntegerArgumentType.integer()).then(
-                            CommandManager.argument("toX", IntegerArgumentType.integer()).then(
+                            CommandManager.argument(
+
+        CommandR"toX", IntegerArgumentType.integer()).then(
                                 CommandManager.argument("toY", IntegerArgumentType.integer())
                             )
                         )
