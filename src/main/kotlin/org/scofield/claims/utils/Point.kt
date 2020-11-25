@@ -7,14 +7,25 @@ data class Point(
     var y: Int
 ) {
     infix fun inside(area: Rect): Boolean {
-        return this.x >= area.x &&
-                this.y >= area.y &&
-                this.x <= area.x + area.width &&
-                this.y <= area.y + area.height
+        return this >= area.topLeft &&
+                this <= area.bottomRight
     }
 
     infix fun inside(claim: Claim): Boolean = this inside claim.area
 
-    fun add(rhs: Point): Point = Point(x + rhs.x, y + rhs.y)
-    fun add(x: Int, y: Int): Point = Point(this.x + x, this.y + y)
+    infix operator fun plus(rhs: Point) = Point(x + rhs.x, y + rhs.y)
+    infix operator fun minus(rhs: Point) = Point(x - rhs.x, y - rhs.y)
+    fun add(x: Int, y: Int) = Point(this.x + x, this.y + y)
+
+    infix operator fun compareTo(rhs: Point): Int {
+        val a = rhs.x - this.x
+        val b = rhs.y - this.y
+        return if (a < 0 && b < 0) {
+            -1
+        } else if (a > 0 && b > 0) {
+            1
+        } else {
+            0
+        }
+    }
 }

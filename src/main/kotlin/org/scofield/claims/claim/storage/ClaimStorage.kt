@@ -76,22 +76,6 @@ data class ClaimStorage(
     }
 
     /**
-     * Checks if a claim collides with any other already existing claim.
-     *
-     * @param claim The claim to check.
-     *
-     * @return A boolean indicating if there is a collision.
-     *
-     */
-    fun isClaimConflicted(claim: Claim): Boolean {
-        for ((_, key) in this.layerMap) {
-            val value = this.valueMap[key]!!
-            if (claim.area intersects value.area) return true
-        }
-        return false
-    }
-
-    /**
      * Gets the colliding claim if it exists.
      *
      * @param playerId Player id to check against the claim's owner.
@@ -100,18 +84,23 @@ data class ClaimStorage(
      * @return A pair containing the layer depth and colliding claim.
      *
      */
-    fun getCollidingClaim(playerId: UUID, claim: Claim): Pair<Int, UUID>? {
+    fun getCollidingClaim(playerId: UUID, claim: Claim): CollidingClaimReturnType {
         for ((layer, key) in this.layerMap) {
             val value = this.valueMap[key]!!
             if (claim.area intersects value.area) {
-                return if (playerId == value.ownerId) Pair(layer, key) else null
+                return if (value.hasPermission(playerId, ClaimPermission.CREATE_CLAIM)) {
+                    CollidingClaimReturnType(true, Pair(layer, key))
+                } else {
+                    CollidingClaimReturnType(true)
+                }
             }
         }
-        return null
+        return CollidingClaimReturnType()
     }
 
     /**
      * Creates a new claim.
+     *  - Creates a subclaim if the player is trying to claim inside an already existing claim
      *
      * @param player The player creating the claim.
      * @param area The area the claim should be covering.
@@ -123,35 +112,29 @@ data class ClaimStorage(
     fun createClaim(player: ServerPlayerEntity, area: Rect): Boolean {
         val uuid = this.generateUuid()
         val claim = Claim(player.uuid, area)
+        val (collidingClaimExists, entryPair) = this.getCollidingClaim(player.uuid, claim)
 
-        if (this.isClaimConflicted(claim)) {
-            return false
+        // Create a subclaim
+        if (collidingClaimExists) {
+            if (entryPair == null) {
+                // Add a response to the player
+                return false
+            }
+
+            val (layer, parentClaimId) = entryPair
+
+            claim.parentClaimId = parentClaimId
+
+            val parentClaim = this.valueMap[parentClaimId]!!
+            parentClaim.subclaims.add(uuid)
+
+            this[uuid] = Pair(layer, claim)
+
+            return true
         }
 
+        // Create a normal claim
         this[uuid] = Pair(0, claim)
-
-        return true
-    }
-
-    /**
-     * Creates a new subclaim within a claim.
-     *
-     * @throws StackOverflowError If the [generateUuid] function recurses for long enough.
-     *
-     * @return A boolean indicating if the creation was successful.
-     */
-    fun createSubclaim(player: ServerPlayerEntity, area: Rect): Boolean {
-        val uuid = this.generateUuid()
-        val claim = Claim(player.uuid, area)
-
-        val (layer, parentId) = this.getCollidingClaim(player.uuid, claim) ?: return false
-
-        claim.parentClaimId = parentId
-
-        val parentClaim = this.valueMap[parentId]!!
-        parentClaim.subclaims.add(uuid)
-
-        this[uuid] = Pair(layer, claim)
 
         return true
     }
@@ -218,3 +201,9 @@ data class ClaimStorage(
         return null
     }
 }
+
+// sucks not to have Rust enums
+data class CollidingClaimReturnType (
+    val claimExists: Boolean = false,
+    val pair: Pair<Int, UUID>? = null
+)

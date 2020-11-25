@@ -11,6 +11,7 @@ import java.util.*
  * */
 enum class ClaimPermission {
     // Claim manipulation
+    CREATE_CLAIM,
     DELETE_CLAIM,
 
     // Block interact events
