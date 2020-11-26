@@ -34,7 +34,7 @@ class CommandSet {
                     CommandManager.argument("fromX", IntegerArgumentType.integer()).then(
                         CommandManager.argument("fromY", IntegerArgumentType.integer()).then(
                             CommandManager.argument("toX", IntegerArgumentType.integer()).then(
-                                CommandManager.argument("toY", IntegerArgumentType.integer()).executes()
+                                CommandManager.argument("toY", IntegerArgumentType.integer()).executes(::newClaim)
                             )
                         )
                     )
